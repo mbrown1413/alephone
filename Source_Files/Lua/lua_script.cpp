@@ -62,6 +62,7 @@ LUA_SCRIPT.CPP
 
 #include "mouse.h"
 #include "interface.h"
+#include "vbl_definitions.h"
 
 #ifdef HAVE_LUA
 extern "C"
@@ -781,6 +782,8 @@ static int L_Kill_Script(lua_State*);
 static int L_Hide_Interface(lua_State*);
 static int L_Show_Interface(lua_State*);
 static int L_Player_Control(lua_State*);
+int L_Set_Gamespeed(lua_State *L);
+int L_Get_Key(lua_State *L);
 
 void LuaState::RegisterFunctions()
 {
@@ -790,6 +793,8 @@ void LuaState::RegisterFunctions()
 	lua_register(State(), "hide_interface", L_Hide_Interface);
 	lua_register(State(), "show_interface", L_Show_Interface);
 	lua_register(State(), "player_control", L_Player_Control);
+	lua_register(State(), "set_gamespeed", L_Set_Gamespeed);
+	lua_register(State(), "get_key", L_Get_Key);
 //	lua_register(state, "prompt", L_Prompt);
 
 	Lua_Map_register(State());
@@ -1709,6 +1714,42 @@ int L_Player_Control(lua_State *L)
 	}
 	return 0;
 }
+
+int L_Set_Gamespeed(lua_State *L)
+{
+	if (!lua_isnumber(L,1))
+	{
+		lua_pushstring(L, "set_gamespeed: incorrect argument type");
+		lua_error(L);
+	}
+	game_speed_multiplier = static_cast<float>(lua_tonumber(L,1));
+	return 0;
+}
+
+int L_Get_Key(lua_State *L)
+{
+	if (!lua_isnumber(L,1))
+	{
+		lua_pushstring(L, "get_key: incorrect argument type");
+		lua_error(L);
+	}
+	int keycode = static_cast<int>(lua_tonumber(L,1));
+	if (keycode < 0 || keycode >= SDL_NUM_SCANCODES) {
+		lua_pushstring(L, "get_key: bad key code");
+		lua_error(L);
+	}
+
+	Uint8 key_map[SDL_NUM_SCANCODES];
+	if (Console::instance()->input_active()) {
+		memset(key_map, 0, sizeof(key_map));
+		printf("INPUT NOT ACTIVE\n");
+	} else {
+		memcpy(key_map, SDL_GetKeyboardState(NULL), sizeof(key_map));
+	}
+
+	return key_map[keycode];
+}
+
 /*
 static void L_Prompt_Callback(const std::string& str) {
   if(L_Should_Call("prompt_callback"))

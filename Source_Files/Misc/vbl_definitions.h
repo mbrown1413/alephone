@@ -72,6 +72,7 @@ struct replay_private_data {
 
 /* ----- globals */
 extern struct replay_private_data replay;
+extern float game_speed_multiplier;
 
 /* ------ prototypes */
 #ifndef DEBUG

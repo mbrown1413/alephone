@@ -121,6 +121,7 @@ inline short memory_error() {return 0;}
 
 /* ---------- globals */
 
+float game_speed_multiplier = 0.5;
 static int32 heartbeat_count;
 static bool input_task_active;
 static timer_task_proc input_task;
@@ -1260,8 +1261,8 @@ void execute_timer_tasks(uint32 time)
 		tm_accum += now - tm_last;
 		tm_last = now;
 		bool first_time = true;
-		while (tm_accum >= tm_period) {
-			tm_accum -= tm_period;
+		while (tm_accum >= tm_period / game_speed_multiplier) {
+			tm_accum -= tm_period / game_speed_multiplier;
 			if (first_time) {
 				if(get_keyboard_controller_status())
 					mouse_idle(input_preferences->input_device);
