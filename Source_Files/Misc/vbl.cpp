@@ -121,7 +121,7 @@ inline short memory_error() {return 0;}
 
 /* ---------- globals */
 
-float game_speed_multiplier = 0.5;
+float game_speed_multiplier = 1.0;
 static int32 heartbeat_count;
 static bool input_task_active;
 static timer_task_proc input_task;
